@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Project Dashboard - Pie Chart Palettes</title>
+
+    <!-- Highcharts libraries -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #1f2937;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            background-color: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            min-width: 0;
+        }
+
+        .chart {
+            width: 100%;
+            height: 430px;
+        }
+
+        @media (max-width: 900px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Project Management Dashboard</h1>
+
+    <p class="description">
+        Compare three professional color palettes using sample project data
+    </p>
+
+    <div class="charts-container">
+
+        <div class="chart-card">
+            <div id="corporateChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="neutralChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="vibrantChart" class="chart"></div>
+        </div>
+
+    </div>
+
+    <script>
+
+        // =====================================
+        // PALETTE 1: CORPORATE PROFESSIONAL
+        // =====================================
+
+        var corporateColors = [
+            "#2563EB", "#0F766E", "#F59E0B", "#7C3AED",
+            "#DB2777", "#0891B2", "#65A30D", "#EA580C",
+            "#4F46E5", "#059669", "#B45309", "#9333EA",
+            "#BE123C", "#0E7490", "#4D7C0F"
+        ];
+
+
+        // =====================================
+        // PALETTE 2: NEUTRAL AND MINIMALIST
+        // =====================================
+
+        var neutralColors = [
+            "#334155", "#64748B", "#0F766E", "#2563EB",
+            "#A16207", "#7C3AED", "#BE123C", "#0E7490",
+            "#475569", "#0369A1", "#4D7C0F", "#9F1239",
+            "#6D28D9", "#115E59", "#854D0E"
+        ];
+
+
+        // =====================================
+        // PALETTE 3: VIBRANT MODERN
+        // =====================================
+
+        var vibrantColors = [
+            "#F72585", "#7209B7", "#4361EE", "#4CC9F0",
+            "#F97316", "#16A34A", "#EAB308", "#DB2777",
+            "#0891B2", "#8B5CF6", "#DC2626", "#65A30D",
+            "#EA580C", "#0284C7", "#C026D3"
+        ];
+
+
+        // =====================================
+        // SAMPLE DATA 1: 10 LOCATIONS
+        // =====================================
+
+        var locationData = [
+            { name: "Pune", y: 18 },
+            { name: "Mumbai", y: 15 },
+            { name: "Delhi", y: 12 },
+            { name: "Bengaluru", y: 10 },
+            { name: "Hyderabad", y: 9 },
+            { name: "Chennai", y: 8 },
+            { name: "Kolkata", y: 7 },
+            { name: "Ahmedabad", y: 6 },
+            { name: "Jaipur", y: 5 },
+            { name: "Nagpur", y: 4 }
+        ];
+
+
+        // =====================================
+        // SAMPLE DATA 2: 8 CATEGORIES
+        // =====================================
+
+        var categoryData = [
+            { name: "IT", y: 25 },
+            { name: "Construction", y: 20 },
+            { name: "Research", y: 18 },
+            { name: "Finance", y: 14 },
+            { name: "Healthcare", y: 12 },
+            { name: "Education", y: 10 },
+            { name: "Manufacturing", y: 8 },
+            { name: "Infrastructure", y: 6 }
+        ];
+
+
+        // =====================================
+        // SAMPLE DATA 3: 15 LOCATIONS
+        // =====================================
+
+        var largeLocationData = [
+            { name: "Pune", y: 20 },
+            { name: "Mumbai", y: 18 },
+            { name: "Delhi", y: 16 },
+            { name: "Bengaluru", y: 14 },
+            { name: "Hyderabad", y: 12 },
+            { name: "Chennai", y: 11 },
+            { name: "Kolkata", y: 10 },
+            { name: "Ahmedabad", y: 9 },
+            { name: "Jaipur", y: 8 },
+            { name: "Nagpur", y: 7 },
+            { name: "Surat", y: 6 },
+            { name: "Indore", y: 5 },
+            { name: "Lucknow", y: 4 },
+            { name: "Bhopal", y: 3 },
+            { name: "Nashik", y: 2 }
+        ];
+
+
+        // =====================================
+        // REUSABLE 3D PIE CHART FUNCTION
+        // =====================================
+
+        function createPieChart(
+            containerId,
+            chartTitle,
+            chartData,
+            chartColors
+        ) {
+
+            Highcharts.chart(containerId, {
+
+                chart: {
+                    type: "pie",
+                    backgroundColor: "transparent",
+
+                    options3d: {
+                        enabled: true,
+                        alpha: 45,
+                        beta: 0
+                    }
+                },
+
+                title: {
+                    text: chartTitle,
+
+                    style: {
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                        color: "#1f2937"
+                    }
+                },
+
+                subtitle: {
+                    text: chartData.length + " items",
+
+                    style: {
+                        color: "#64748b"
+                    }
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                colors: chartColors,
+
+                tooltip: {
+                    pointFormat:
+                        "<b>{point.y}</b> projects<br>" +
+                        "Share: <b>{point.percentage:.1f}%</b>"
+                },
+
+                legend: {
+                    enabled: true,
+                    align: "center",
+                    verticalAlign: "bottom",
+                    layout: "horizontal",
+
+                    itemStyle: {
+                        color: "#334155",
+                        fontSize: "11px",
+                        fontWeight: "normal"
+                    }
+                },
+
+                plotOptions: {
+
+                    pie: {
+                        depth: 35,
+                        allowPointSelect: true,
+                        cursor: "pointer",
+                        showInLegend: true,
+
+                        // Every slice gets its own palette color.
+                        colorByPoint: true,
+
+                        dataLabels: {
+                            enabled: true,
+                            format: "{point.percentage:.1f}%",
+                            distance: 10,
+
+                            style: {
+                                color: "#1f2937",
+                                textOutline: "none",
+                                fontSize: "10px"
+                            }
+                        },
+
+                        // Prevent inactive slices from fading.
+                        states: {
+                            inactive: {
+                                enabled: false,
+                                opacity: 1
+                            },
+
+                            hover: {
+                                enabled: true,
+                                brightness: 0,
+                                halo: {
+                                    size: 0
+                                }
+                            }
+                        }
+                    },
+
+                    series: {
+                        opacity: 1
+                    }
+                },
+
+                series: [{
+                    name: "Projects",
+                    data: chartData
+                }]
+            });
+        }
+
+
+        // =====================================
+        // CREATE ALL THREE CHARTS
+        // =====================================
+
+        // Chart 1: Corporate palette, 10 locations
+        createPieChart(
+            "corporateChart",
+            "Corporate Professional - Locations",
+            locationData,
+            corporateColors
+        );
+
+        // Chart 2: Neutral palette, 8 categories
+        createPieChart(
+            "neutralChart",
+            "Neutral and Minimalist - Categories",
+            categoryData,
+            neutralColors
+        );
+
+        // Chart 3: Vibrant palette, 15 locations
+        createPieChart(
+            "vibrantChart",
+            "Vibrant Modern - Locations",
+            largeLocationData,
+            vibrantColors
+        );
+
+    </script>
+
+</body>
+</html>
