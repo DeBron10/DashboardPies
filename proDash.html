@@ -1,0 +1,1062 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management Dashboard</title>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f4ff, #fff5f8, #effdf9);
+            color: #202b3c;
+            padding: 25px;
+        }
+
+        .dashboard {
+            max-width: 1600px;
+            margin: auto;
+        }
+
+        /* Header */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            color: #26347a;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #69758c;
+            font-size: 14px;
+        }
+
+        .header-tag {
+            background: linear-gradient(135deg, #6847e8, #a34ce7);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Summary cards */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .summary-card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 205px;
+            padding: 24px;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 8px 22px #28326420;
+            transition: transform 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .summary-card:nth-child(1) {
+            background: linear-gradient(135deg, #3867f4, #6246ea);
+        }
+
+        .summary-card:nth-child(2) {
+            background: linear-gradient(135deg, #00bfa6, #009bd5);
+        }
+
+        .summary-card:nth-child(3) {
+            background: linear-gradient(135deg, #ff9d2f, #ff6548);
+        }
+
+        .summary-card:nth-child(4) {
+            background: linear-gradient(135deg, #a34ee8, #e34d9b);
+        }
+
+        .card-label {
+            font-size: 12px;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .card-count {
+            font-size: 39px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .card-footer {
+            font-size: 12px;
+            color: #ffffffdf;
+            margin-bottom: 20px;
+        }
+
+        /* Centered button with border lines */
+
+        .view-btn {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: auto;
+            padding: 14px 0 0;
+
+            border: none;
+            border-top: 1px solid transparent;
+            background: transparent;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .view-btn::before,
+        .view-btn::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #ffffff85;
+            transition: background 0.2s;
+        }
+
+        .view-btn:hover::before,
+        .view-btn:hover::after {
+            background: white;
+        }
+
+        .view-btn span {
+            white-space: nowrap;
+        }
+
+        /* Chart section */
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-heading h2 {
+            color: #26347a;
+            font-size: 22px;
+        }
+
+        .section-heading span {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            min-width: 0;
+            background: white;
+            border: 1px solid #e6e9f5;
+            border-top: 5px solid #5b5ce2;
+            border-radius: 14px;
+            padding: 20px 12px 10px;
+            box-shadow: 0 7px 24px #34407812;
+        }
+
+        .chart-card:nth-child(2) {
+            border-top-color: #00bfa6;
+        }
+
+        .chart-card:nth-child(3) {
+            border-top-color: #ff9d2f;
+        }
+
+        .chart-card h3 {
+            font-size: 16px;
+            color: #26347a;
+            margin: 0 10px 8px;
+        }
+
+        .chart-description {
+            font-size: 12px;
+            color: #8791a7;
+            margin: 0 10px;
+        }
+
+        .chart {
+            width: 100%;
+            height: 420px;
+        }
+
+        .footer-note {
+            text-align: right;
+            color: #8993a7;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        /* Modal */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(17, 24, 52, 0.65);
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            width: 100%;
+            max-width: 1000px;
+            max-height: 90vh;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 80px #00000030;
+            animation: modalOpen 0.2s ease-out;
+        }
+
+        @keyframes modalOpen {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 22px 25px;
+            background: linear-gradient(135deg, #f2f4ff, #f9f1ff);
+            border-bottom: 1px solid #e6e9f5;
+        }
+
+        .modal-header h2 {
+            color: #26347a;
+            font-size: 21px;
+            margin-bottom: 6px;
+        }
+
+        .modal-header p {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .close-btn {
+            border: none;
+            background: white;
+            color: #59657b;
+            font-size: 25px;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .close-btn:hover {
+            background: #ffe5eb;
+            color: #d72654;
+        }
+
+        .modal-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 25px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .modal-summary {
+            color: #59657b;
+            font-size: 13px;
+        }
+
+        .modal-summary strong {
+            color: #4f46e5;
+            font-size: 17px;
+        }
+
+        .search-box {
+            width: 290px;
+            max-width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #dce2ed;
+            border-radius: 8px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .search-box:focus {
+            border-color: #6557e8;
+            box-shadow: 0 0 0 3px #6557e81a;
+        }
+
+        .table-container {
+            overflow: auto;
+            flex: 1;
+            min-height: 150px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #f7f8fc;
+        }
+
+        th {
+            color: #59657b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 15px 20px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 13px;
+            color: #344054;
+        }
+
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        .project-name {
+            font-weight: bold;
+            color: #3545a5;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status-planning {
+            color: #6941c6;
+            background: #eee6ff;
+        }
+
+        .status-progress {
+            color: #087e70;
+            background: #d9f8f0;
+        }
+
+        .status-hold {
+            color: #b45309;
+            background: #fff0d5;
+        }
+
+        .status-completed {
+            color: #157347;
+            background: #dcfce7;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 45px 15px;
+            color: #8993a7;
+            font-size: 14px;
+        }
+
+        .modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid #edf0f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            color: #8993a7;
+            font-size: 12px;
+        }
+
+        .done-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .done-btn:hover {
+            background: #3730a3;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 1150px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .charts-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 14px;
+            }
+
+            .summary-grid,
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart {
+                height: 400px;
+            }
+
+            .modal-overlay {
+                padding: 8px;
+            }
+
+            .modal {
+                max-height: 95vh;
+            }
+
+            .modal-header,
+            .modal-toolbar {
+                padding: 15px;
+            }
+
+            .modal-header h2 {
+                font-size: 18px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 13px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <div class="header">
+        <div>
+            <h1>Project Dashboard</h1>
+            <p>Monitor project progress, categories and locations</p>
+        </div>
+        <div class="header-tag">PROJECT OVERVIEW</div>
+    </div>
+
+    <!-- Summary cards -->
+
+    <div class="summary-grid">
+
+        <div class="summary-card">
+            <div class="card-label">TOTAL PROJECTS</div>
+            <div class="card-count" id="totalCount">0</div>
+            <div class="card-footer">All registered projects</div>
+            <button class="view-btn" onclick="openProjectModal('All')">
+                <span>View Projects &rarr;</span>
+            </button>
+        </div>
+
+        <div class="summary-card">
+            <div class="card-label">IN PROGRESS</div>
+            <div class="card-count" id="progressCount">0</div>
+            <div class="card-footer">Projects currently underway</div>
+            <button class="view-btn" onclick="openProjectModal('In Progress')">
+                <span>View Projects &rarr;</span>
+            </button>
+        </div>
+
+        <div class="summary-card">
+            <div class="card-label">ON HOLD</div>
+            <div class="card-count" id="holdCount">0</div>
+            <div class="card-footer">Projects temporarily paused</div>
+            <button class="view-btn" onclick="openProjectModal('On Hold')">
+                <span>View Projects &rarr;</span>
+            </button>
+        </div>
+
+        <div class="summary-card">
+            <div class="card-label">COMPLETED</div>
+            <div class="card-count" id="completedCount">0</div>
+            <div class="card-footer">Successfully completed projects</div>
+            <button class="view-btn" onclick="openProjectModal('Completed')">
+                <span>View Projects &rarr;</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Charts -->
+
+    <div class="section-heading">
+        <h2>Project Analytics</h2>
+        <span>Distribution by stage, category and location</span>
+    </div>
+
+    <div class="charts-grid">
+
+        <div class="chart-card">
+            <h3>Projects by Stage</h3>
+            <p class="chart-description">Illustrative 80/20 distribution</p>
+            <div id="stageChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Projects by Category</h3>
+            <p class="chart-description">Portfolio composition from sample projects</p>
+            <div id="categoryChart" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <h3>Projects by Location</h3>
+            <p class="chart-description">Distribution across sample locations</p>
+            <div id="locationChart" class="chart"></div>
+        </div>
+
+    </div>
+
+    <div class="footer-note">Sample data for demonstration purposes</div>
+</div>
+
+
+<!-- Project List Modal -->
+
+<div class="modal-overlay" id="projectModal"
+     onclick="handleOverlayClick(event)">
+
+    <div class="modal" role="dialog" aria-modal="true"
+         aria-labelledby="modalTitle">
+
+        <div class="modal-header">
+            <div>
+                <h2 id="modalTitle">Project List</h2>
+                <p id="modalSubtitle">View and search project records</p>
+            </div>
+
+            <button class="close-btn" onclick="closeProjectModal()"
+                    aria-label="Close modal">&times;</button>
+        </div>
+
+        <div class="modal-toolbar">
+            <div class="modal-summary">
+                Showing <strong id="visibleCount">0</strong> projects
+            </div>
+
+            <input type="text" id="projectSearch" class="search-box"
+                   placeholder="Search project, category or location..."
+                   oninput="renderProjectTable()">
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Project Name</th>
+                        <th>Stage</th>
+                        <th>Category</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+
+                <tbody id="projectTableBody"></tbody>
+            </table>
+
+            <div id="emptyMessage" class="empty-message" style="display:none;">
+                No projects found matching your search.
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <span>Project information shown from sample data</span>
+            <button class="done-btn" onclick="closeProjectModal()">Done</button>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    // ========================================
+    // 1. SAMPLE PROJECT DATA
+    // ========================================
+
+    var projects = [
+        { id: 1, name: "Project Alpha", stage: "Planning", category: "IT", location: "Pune" },
+        { id: 2, name: "Project Beta", stage: "In Progress", category: "Construction", location: "Mumbai" },
+        { id: 3, name: "Project Gamma", stage: "Completed", category: "Research", location: "Delhi" },
+        { id: 4, name: "Project Delta", stage: "On Hold", category: "IT", location: "Nashik" },
+        { id: 5, name: "Project Epsilon", stage: "In Progress", category: "Construction", location: "Nagpur" },
+        { id: 6, name: "Project Zeta", stage: "Completed", category: "Research", location: "Thane" },
+        { id: 7, name: "Project Eta", stage: "Planning", category: "IT", location: "Aurangabad" },
+        { id: 8, name: "Project Theta", stage: "In Progress", category: "Construction", location: "Kolhapur" },
+        { id: 9, name: "Project Iota", stage: "Completed", category: "Research", location: "Satara" },
+        { id: 10, name: "Project Kappa", stage: "On Hold", category: "IT", location: "Solapur" },
+        { id: 11, name: "Project Lambda", stage: "Planning", category: "Construction", location: "Indore" },
+        { id: 12, name: "Project Mu", stage: "In Progress", category: "Research", location: "Surat" },
+        { id: 13, name: "Project Nu", stage: "Completed", category: "IT", location: "Hyderabad" },
+        { id: 14, name: "Project Xi", stage: "In Progress", category: "Construction", location: "Bengaluru" },
+        { id: 15, name: "Project Omicron", stage: "Planning", category: "Research", location: "Chennai" },
+        { id: 16, name: "Project Pi", stage: "Planning", category: "IT", location: "Pune" },
+        { id: 17, name: "Project Rho", stage: "In Progress", category: "Research", location: "Mumbai" },
+        { id: 18, name: "Project Sigma", stage: "Completed", category: "Construction", location: "Delhi" },
+        { id: 19, name: "Project Tau", stage: "On Hold", category: "IT", location: "Nashik" },
+        { id: 20, name: "Project Upsilon", stage: "In Progress", category: "Construction", location: "Nagpur" },
+        { id: 21, name: "Project Phi", stage: "Completed", category: "IT", location: "Thane" },
+        { id: 22, name: "Project Chi", stage: "Planning", category: "Research", location: "Aurangabad" },
+        { id: 23, name: "Project Psi", stage: "In Progress", category: "IT", location: "Kolhapur" },
+        { id: 24, name: "Project Omega", stage: "Completed", category: "Construction", location: "Satara" },
+        { id: 25, name: "Project Horizon", stage: "In Progress", category: "Research", location: "Solapur" },
+        { id: 26, name: "Project Summit", stage: "Planning", category: "IT", location: "Indore" },
+        { id: 27, name: "Project Vertex", stage: "Completed", category: "Construction", location: "Surat" },
+        { id: 28, name: "Project Nexus", stage: "In Progress", category: "IT", location: "Hyderabad" },
+        { id: 29, name: "Project Orbit", stage: "Planning", category: "Research", location: "Bengaluru" },
+        { id: 30, name: "Project Vision", stage: "Completed", category: "Construction", location: "Chennai" },
+        { id: 31, name: "Project Spark", stage: "In Progress", category: "IT", location: "Pune" },
+        { id: 32, name: "Project Nova", stage: "Planning", category: "Construction", location: "Mumbai" },
+        { id: 33, name: "Project Quest", stage: "Completed", category: "Research", location: "Delhi" },
+        { id: 34, name: "Project Pulse", stage: "In Progress", category: "IT", location: "Nashik" },
+        { id: 35, name: "Project Apex", stage: "On Hold", category: "Research", location: "Nagpur" }
+    ];
+
+
+    // ========================================
+    // 2. COUNT PROJECTS
+    // ========================================
+
+    function getCounts(property) {
+        var counts = {};
+
+        for (var i = 0; i < projects.length; i++) {
+            var value = projects[i][property];
+
+            if (counts[value] === undefined) {
+                counts[value] = 0;
+            }
+
+            counts[value]++;
+        }
+
+        return counts;
+    }
+
+    function makeChartData(counts) {
+        var chartData = [];
+
+        for (var name in counts) {
+            chartData.push({
+                name: name,
+                y: counts[name]
+            });
+        }
+
+        return chartData;
+    }
+
+
+    // ========================================
+    // 3. UPDATE SUMMARY CARDS
+    // ========================================
+
+    var stageCounts = getCounts("stage");
+    var categoryCounts = getCounts("category");
+    var locationCounts = getCounts("location");
+
+    document.getElementById("totalCount").textContent = projects.length;
+
+    document.getElementById("progressCount").textContent =
+        stageCounts["In Progress"] || 0;
+
+    document.getElementById("holdCount").textContent =
+        stageCounts["On Hold"] || 0;
+
+    document.getElementById("completedCount").textContent =
+        stageCounts["Completed"] || 0;
+
+
+    // ========================================
+    // 4. PROJECT LIST MODAL
+    // ========================================
+
+    var selectedStage = "All";
+
+    function openProjectModal(stage) {
+        selectedStage = stage;
+
+        var title = "All Projects";
+
+        if (stage !== "All") {
+            title = stage + " Projects";
+        }
+
+        document.getElementById("modalTitle").textContent = title;
+
+        if (stage === "All") {
+            document.getElementById("modalSubtitle").textContent =
+                "Browse all registered project records";
+        } else {
+            document.getElementById("modalSubtitle").textContent =
+                "Projects currently marked as " + stage;
+        }
+
+        document.getElementById("projectSearch").value = "";
+
+        renderProjectTable();
+
+        document.getElementById("projectModal").classList.add("show");
+        document.body.style.overflow = "hidden";
+
+        document.getElementById("projectSearch").focus();
+    }
+
+    function closeProjectModal() {
+        document.getElementById("projectModal").classList.remove("show");
+        document.body.style.overflow = "";
+    }
+
+    function handleOverlayClick(event) {
+        if (event.target.id === "projectModal") {
+            closeProjectModal();
+        }
+    }
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            closeProjectModal();
+        }
+    });
+
+    function renderProjectTable() {
+        var searchText = document.getElementById("projectSearch")
+            .value.toLowerCase().trim();
+
+        var tableBody = document.getElementById("projectTableBody");
+        var emptyMessage = document.getElementById("emptyMessage");
+
+        tableBody.innerHTML = "";
+
+        var visibleProjects = [];
+
+        for (var i = 0; i < projects.length; i++) {
+            var project = projects[i];
+
+            // Filter by the selected summary card
+
+            if (selectedStage !== "All" &&
+                project.stage !== selectedStage) {
+                continue;
+            }
+
+            // Search across project fields
+
+            var searchableText =
+                project.id + " " +
+                project.name + " " +
+                project.stage + " " +
+                project.category + " " +
+                project.location;
+
+            if (searchableText.toLowerCase().indexOf(searchText) === -1) {
+                continue;
+            }
+
+            visibleProjects.push(project);
+        }
+
+        document.getElementById("visibleCount").textContent =
+            visibleProjects.length;
+
+        if (visibleProjects.length === 0) {
+            emptyMessage.style.display = "block";
+            return;
+        }
+
+        emptyMessage.style.display = "none";
+
+        for (var j = 0; j < visibleProjects.length; j++) {
+            var item = visibleProjects[j];
+            var row = document.createElement("tr");
+
+            var idCell = document.createElement("td");
+            idCell.textContent = "PRJ-" +
+                String(item.id).padStart(3, "0");
+
+            var nameCell = document.createElement("td");
+            nameCell.className = "project-name";
+            nameCell.textContent = item.name;
+
+            var stageCell = document.createElement("td");
+            var statusBadge = document.createElement("span");
+            statusBadge.className = "status";
+
+            if (item.stage === "Planning") {
+                statusBadge.classList.add("status-planning");
+            } else if (item.stage === "In Progress") {
+                statusBadge.classList.add("status-progress");
+            } else if (item.stage === "On Hold") {
+                statusBadge.classList.add("status-hold");
+            } else if (item.stage === "Completed") {
+                statusBadge.classList.add("status-completed");
+            }
+
+            statusBadge.textContent = item.stage;
+            stageCell.appendChild(statusBadge);
+
+            var categoryCell = document.createElement("td");
+            categoryCell.textContent = item.category;
+
+            var locationCell = document.createElement("td");
+            locationCell.textContent = item.location;
+
+            row.appendChild(idCell);
+            row.appendChild(nameCell);
+            row.appendChild(stageCell);
+            row.appendChild(categoryCell);
+            row.appendChild(locationCell);
+
+            tableBody.appendChild(row);
+        }
+    }
+
+
+    // ========================================
+    // 5. CHART COLORS
+    // ========================================
+
+    var brightColors = [
+        "#4361EE",
+        "#F72585",
+        "#06D6A0",
+        "#FF9F1C",
+        "#7209B7",
+        "#00B4D8",
+        "#EF476F",
+        "#8AC926",
+        "#FF6B35",
+        "#3A86FF",
+        "#8338EC",
+        "#2EC4B6",
+        "#FFBE0B",
+        "#FB5607",
+        "#577590"
+    ];
+
+
+    // ========================================
+    // 6. REUSABLE 3D PIE CHART
+    // ========================================
+
+    function createPieChart(containerId, title, data) {
+        Highcharts.chart(containerId, {
+            chart: {
+                type: "pie",
+                backgroundColor: "transparent",
+                options3d: {
+                    enabled: true,
+                    alpha: 45,
+                    beta: 0,
+                    depth: 40,
+                    viewDistance: 25
+                },
+                spacing: [10, 5, 5, 5]
+            },
+
+            title: {
+                text: null
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            exporting: {
+                enabled: true
+            },
+
+            tooltip: {
+                backgroundColor: "#172554",
+                borderColor: "#172554",
+                borderRadius: 8,
+                style: {
+                    color: "#FFFFFF",
+                    fontSize: "12px"
+                },
+                pointFormat:
+                    "<b>{point.y} projects</b><br/>" +
+                    "{point.percentage:.2f}% of chart total"
+            },
+
+            legend: {
+                enabled: true,
+                align: "center",
+                verticalAlign: "bottom",
+                layout: "horizontal",
+                itemWidth: 115,
+                itemMarginTop: 5,
+                itemMarginBottom: 5,
+                symbolRadius: 3,
+                symbolHeight: 10,
+                symbolWidth: 10,
+                itemStyle: {
+                    color: "#344054",
+                    fontSize: "11px",
+                    fontWeight: "normal"
+                }
+            },
+
+            plotOptions: {
+                pie: {
+                    depth: 35,
+                    allowPointSelect: true,
+                    cursor: "pointer",
+                    showInLegend: true,
+                    colorByPoint: true,
+                    borderWidth: 2,
+                    borderColor: "#FFFFFF",
+                    slicedOffset: 8,
+
+                    dataLabels: {
+                        enabled: true,
+                        format: "{point.percentage:.2f}%",
+                        distance: 8,
+                        padding: 0,
+                        style: {
+                            fontSize: "10px",
+                            fontWeight: "bold",
+                            color: "#263449",
+                            textOutline: "1px contrast"
+                        }
+                    },
+
+                    states: {
+                        hover: {
+                            brightness: 0.12
+                        }
+                    }
+                }
+            },
+
+            colors: brightColors,
+
+            series: [{
+                name: title,
+                data: data
+            }]
+        });
+    }
+
+
+    // ========================================
+    // 7. DISPLAY ALL CHARTS
+    // ========================================
+
+    // Fixed demonstration values:
+    // One section = 80%
+    // Three sections = 6.67%, 6.67%, and 6.66%
+
+    var stageChartData = [
+        { name: "In Progress", y: 80 },
+        { name: "Planning", y: 6.67 },
+        { name: "On Hold", y: 6.67 },
+        { name: "Completed", y: 6.66 }
+    ];
+
+    createPieChart(
+        "stageChart",
+        "Projects by Stage",
+        stageChartData
+    );
+
+    // Category chart uses actual sample project counts.
+
+    createPieChart(
+        "categoryChart",
+        "Projects by Category",
+        makeChartData(categoryCounts)
+    );
+
+    // Location chart uses actual sample project counts.
+
+    createPieChart(
+        "locationChart",
+        "Projects by Location",
+        makeChartData(locationCounts)
+    );
+</script>
+
+</body>
+</html>
