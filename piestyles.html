@@ -1,0 +1,405 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Highcharts 3D - 8 Color Palettes</title>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+            min-width: 0;
+        }
+
+        .chart {
+            width: 100%;
+            height: 370px;
+        }
+
+        @media (max-width: 800px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Project Dashboard — Color Palette Gallery</h1>
+    <p class="subtitle">
+        Eight palette styles with different sample-data sizes
+    </p>
+
+    <div class="charts-container">
+
+        <div class="chart-card">
+            <div id="chart1" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="chart2" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="chart3" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="chart4" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="chart5" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="chart6" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="chart7" class="chart"></div>
+        </div>
+
+        <div class="chart-card">
+            <div id="chart8" class="chart"></div>
+        </div>
+
+    </div>
+
+    <script>
+
+        // STYLE 1: Corporate Professional
+        var corporateColors = [
+            "#2563EB", "#0F766E", "#F59E0B", "#7C3AED"
+        ];
+
+        // STYLE 2: Vibrant Modern
+        var vibrantColors = [
+            "#F72585", "#7209B7", "#4361EE", "#4CC9F0"
+        ];
+
+        // STYLE 3: Pastel Soft
+        var pastelColors = [
+            "#A5B4FC", "#86EFAC", "#FDE68A", "#F9A8D4"
+        ];
+
+        // STYLE 4: Monochromatic Blue
+        var blueColors = [
+            "#1E3A8A", "#1D4ED8", "#60A5FA", "#BFDBFE"
+        ];
+
+        // STYLE 5: Sunset Warm
+        var sunsetColors = [
+            "#FF4500", "#FFB703", "#FB7185", "#9D4EDD"
+        ];
+
+        // STYLE 6: Neon High Contrast
+        var neonColors = [
+            "#00E5FF", "#76FF03", "#FF1744", "#D500F9"
+        ];
+
+        // STYLE 7: Nature and Earth
+        var natureColors = [
+            "#166534", "#65A30D", "#A16207", "#0F766E"
+        ];
+
+        // STYLE 8: Neutral and Minimalist
+        var neutralColors = [
+            "#334155", "#64748B", "#94A3B8", "#CBD5E1"
+        ];
+
+
+        // SAMPLE DATA 1: 10 locations
+        var locationData10 = [
+            { name: "Pune", y: 18 },
+            { name: "Mumbai", y: 15 },
+            { name: "Delhi", y: 12 },
+            { name: "Bengaluru", y: 10 },
+            { name: "Hyderabad", y: 9 },
+            { name: "Chennai", y: 8 },
+            { name: "Kolkata", y: 7 },
+            { name: "Ahmedabad", y: 6 },
+            { name: "Jaipur", y: 5 },
+            { name: "Nagpur", y: 4 }
+        ];
+
+        // SAMPLE DATA 2: 8 locations
+        var locationData8 = [
+            { name: "Pune", y: 20 },
+            { name: "Mumbai", y: 16 },
+            { name: "Delhi", y: 14 },
+            { name: "Bengaluru", y: 12 },
+            { name: "Hyderabad", y: 10 },
+            { name: "Chennai", y: 9 },
+            { name: "Kolkata", y: 7 },
+            { name: "Jaipur", y: 5 }
+        ];
+
+        // SAMPLE DATA 3: 4 project stages
+        var stageData4 = [
+            { name: "In Progress", y: 40 },
+            { name: "Completed", y: 30 },
+            { name: "Planning", y: 20 },
+            { name: "On Hold", y: 10 }
+        ];
+
+        // SAMPLE DATA 4: 6 categories
+        var categoryData6 = [
+            { name: "IT", y: 25 },
+            { name: "Construction", y: 20 },
+            { name: "Research", y: 18 },
+            { name: "Finance", y: 14 },
+            { name: "Healthcare", y: 12 },
+            { name: "Education", y: 11 }
+        ];
+
+        // SAMPLE DATA 5: 5 project statuses
+        var statusData5 = [
+            { name: "Active", y: 35 },
+            { name: "Completed", y: 25 },
+            { name: "Pending", y: 18 },
+            { name: "On Hold", y: 12 },
+            { name: "Cancelled", y: 10 }
+        ];
+
+        // SAMPLE DATA 6: 7 project teams
+        var teamData7 = [
+            { name: "Team A", y: 22 },
+            { name: "Team B", y: 19 },
+            { name: "Team C", y: 16 },
+            { name: "Team D", y: 14 },
+            { name: "Team E", y: 12 },
+            { name: "Team F", y: 10 },
+            { name: "Team G", y: 7 }
+        ];
+
+        // SAMPLE DATA 7: 9 locations
+        var locationData9 = [
+            { name: "Pune", y: 19 },
+            { name: "Mumbai", y: 17 },
+            { name: "Delhi", y: 14 },
+            { name: "Bengaluru", y: 12 },
+            { name: "Hyderabad", y: 10 },
+            { name: "Chennai", y: 9 },
+            { name: "Kolkata", y: 7 },
+            { name: "Jaipur", y: 6 },
+            { name: "Surat", y: 6 }
+        ];
+
+        // SAMPLE DATA 8: 3 priority levels
+        var priorityData3 = [
+            { name: "High", y: 25 },
+            { name: "Medium", y: 45 },
+            { name: "Low", y: 30 }
+        ];
+
+
+        // REUSABLE FUNCTION FOR ALL CHARTS
+        function createPieChart(containerId, chartTitle, chartData, chartColors) {
+
+            Highcharts.chart(containerId, {
+
+                chart: {
+                    type: "pie",
+                    backgroundColor: "transparent",
+                    options3d: {
+                        enabled: true,
+                        alpha: 45,
+                        beta: 0
+                    }
+                },
+
+                title: {
+                    text: chartTitle,
+                    style: {
+                        fontSize: "17px",
+                        fontWeight: "bold",
+                        color: "#1f2937"
+                    }
+                },
+
+                subtitle: {
+                    text: chartData.length + " items",
+                    style: {
+                        color: "#64748b"
+                    }
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                tooltip: {
+                    pointFormat:
+                        "<b>{point.y}</b> projects<br>" +
+                        "Share: <b>{point.percentage:.1f}%</b>"
+                },
+
+                legend: {
+                    enabled: true,
+                    itemStyle: {
+                        color: "#334155",
+                        fontSize: "11px",
+                        fontWeight: "normal"
+                    }
+                },
+
+                colors: chartColors,
+
+                plotOptions: {
+                    pie: {
+                        depth: 35,
+                        allowPointSelect: true,
+                        cursor: "pointer",
+                        showInLegend: true,
+
+                        dataLabels: {
+                            enabled: true,
+                            format: "{point.percentage:.1f}%",
+                            distance: 10,
+                            style: {
+                                color: "#1f2937",
+                                textOutline: "none",
+                                fontSize: "10px"
+                            }
+                        },
+
+                        // Keep all slices visible at full opacity.
+                        states: {
+                            inactive: {
+                                enabled: false,
+                                opacity: 1
+                            },
+                            hover: {
+                                enabled: true,
+                                brightness: 0,
+                                halo: {
+                                    size: 0
+                                }
+                            }
+                        }
+                    },
+
+                    series: {
+                        opacity: 1
+                    }
+                },
+
+                series: [{
+                    name: "Projects",
+                    colorByPoint: true,
+                    data: chartData
+                }]
+            });
+        }
+
+
+        // CHART 1 — STYLE 1: CORPORATE PROFESSIONAL
+        // 10 locations
+        createPieChart(
+            "chart1",
+            "Style 1: Corporate Professional",
+            locationData10,
+            corporateColors
+        );
+
+        // CHART 2 — STYLE 2: VIBRANT MODERN
+        // 8 locations
+        createPieChart(
+            "chart2",
+            "Style 2: Vibrant Modern",
+            locationData8,
+            vibrantColors
+        );
+
+        // CHART 3 — STYLE 3: PASTEL SOFT
+        // 4 project stages
+        createPieChart(
+            "chart3",
+            "Style 3: Pastel Soft",
+            stageData4,
+            pastelColors
+        );
+
+        // CHART 4 — STYLE 4: MONOCHROMATIC BLUE
+        // 6 categories
+        createPieChart(
+            "chart4",
+            "Style 4: Monochromatic Blue",
+            categoryData6,
+            blueColors
+        );
+
+        // CHART 5 — STYLE 5: SUNSET WARM
+        // 5 project statuses
+        createPieChart(
+            "chart5",
+            "Style 5: Sunset Warm",
+            statusData5,
+            sunsetColors
+        );
+
+        // CHART 6 — STYLE 6: NEON HIGH CONTRAST
+        // 7 project teams
+        createPieChart(
+            "chart6",
+            "Style 6: Neon High Contrast",
+            teamData7,
+            neonColors
+        );
+
+        // CHART 7 — STYLE 7: NATURE AND EARTH
+        // 9 locations
+        createPieChart(
+            "chart7",
+            "Style 7: Nature and Earth",
+            locationData9,
+            natureColors
+        );
+
+        // CHART 8 — STYLE 8: NEUTRAL AND MINIMALIST
+        // 3 priority levels
+        createPieChart(
+            "chart8",
+            "Style 8: Neutral and Minimalist",
+            priorityData3,
+            neutralColors
+        );
+
+    </script>
+
+</body>
+</html>
